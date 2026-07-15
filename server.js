@@ -48,12 +48,13 @@ app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 adminRouter(app);
 
 app.use((req, res) => {
+  // Agar koi api request ho jo galat ho, to 404 error do
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ message: 'Route not found.' });
   }
-  return res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  // Baki saari requests ko Vercel ke link par redirect kar do
+  return res.redirect('https://multiline-promotional-front-1peotvhbm-multiline-promotional.vercel.app');
 });
-
 async function start() {
   try {
     const client = await pool.connect();

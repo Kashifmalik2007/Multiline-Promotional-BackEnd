@@ -43,22 +43,23 @@ app.use(session({
   }
 }));
 
-// Static files serve karne ke liye index configuration
+// 📂 ====== IMAGES & ATTACHED ASSETS FIX ======
+// Note: Folder ka asli naam 'attached_assets' hai, isliye hum use explicit paths ke sath pehle load kar rahe hain!
+app.use('/attached_assets', express.static(path.join(__dirname, 'public', 'attached_assets')));
+app.use('/attached_assets', express.static(path.join(__dirname, 'Public', 'attached_assets')));
+app.use('/assets', express.static(path.join(__dirname, 'public', 'attached_assets')));
+app.use('/assets', express.static(path.join(__dirname, 'Public', 'attached_assets')));
+
+// Static files serve karne ke liye standard paths
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'Public')));
 
-// 📂 ====== IMAGES & ATTACHED ASSETS ALIAS ======
-// Yeh code '/attached_assets/imagename.png' ko direct backend ke 'public/assets/' se uthaye ga!
-app.use('/attached_assets', express.static(path.join(__dirname, 'public', 'assets')));
-app.use('/attached_assets', express.static(path.join(__dirname, 'Public', 'assets')));
-app.use('/assets', express.static(path.join(__dirname, 'public', 'assets')));
-
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
-// 🔑 ====== 1. ADMIN LOGIN BULLETPROOF HANDLER (Root folder support) ======
+// 🔑 ====== 1. ADMIN LOGIN BULLETPROOF HANDLER (Root level support) ======
 app.get('/admin/login', (req, res) => {
   const possiblePaths = [
-    path.resolve(__dirname, 'admin', 'login.html'), // Root level (jahan abhi aapka folder hai)
+    path.resolve(__dirname, 'admin', 'login.html'), // Root level jahan abhi aapka folder hai
     path.resolve(__dirname, 'public', 'admin', 'login.html'),
     path.resolve(__dirname, 'Public', 'admin', 'login.html'),
     path.resolve(__dirname, 'public', 'login.html')

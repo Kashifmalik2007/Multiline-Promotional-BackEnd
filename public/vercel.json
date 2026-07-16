@@ -1,13 +1,16 @@
 {
-  "version": 2,
   "rewrites": [
+    {
+      "source": "/attached_assets/:path*",
+      "destination": "https://multiline-promotional-backend.onrender.com/attached_assets/:path*"
+    },
+    {
+      "source": "/assets/:path*",
+      "destination": "https://multiline-promotional-backend.onrender.com/attached_assets/:path*"
+    },
     {
       "source": "/api/:path*",
       "destination": "https://multiline-promotional-backend.onrender.com/api/:path*"
-    },
-    {
-      "source": "/admin/:path*",
-      "destination": "https://multiline-promotional-backend.onrender.com/admin/:path*"
     }
   ]
 }

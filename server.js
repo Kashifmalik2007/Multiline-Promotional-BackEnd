@@ -59,7 +59,7 @@ app.get(['/attached_assets/:filename', '/assets/:filename'], (req, res, next) =>
   for (const dir of possibleDirs) {
     if (!fs.existsSync(dir)) continue;
 
-    // 1. Pehle exact filename (jo HTML mang raha hai, e.g. with -ByB_YmiT) check karein
+    // 1. Pehle exact filename check karein (jo HTML mang raha hai, e.g. with -ByB_YmiT)
     const exactPath = path.join(dir, originalFilename);
     if (fs.existsSync(exactPath)) {
       res.sendFile(exactPath);
@@ -77,14 +77,14 @@ app.get(['/attached_assets/:filename', '/assets/:filename'], (req, res, next) =>
       break;
     }
 
-    // 3. AGAR PHIR BHI NA MILE (Deep Prefix Matching for specific files like Crops/Monuments)
+    // 3. AGAR PHIR BHI NA MILE (Deep Prefix Matching for WA0000, businessman, and Monuments)
     try {
       const filesInDir = fs.readdirSync(dir);
       const ext = path.extname(originalFilename);
       const baseNameWithoutExtension = path.basename(originalFilename, ext);
       
-      // Prefix match karein (pehla 15-18 characters, jaise '4_CROPS_MONUMENTS_176942...')
-      const searchPrefix = baseNameWithoutExtension.substring(0, 18); 
+      // Pehle 15 characters match karte hain (jaise 'businessman-sho', 'IMG-20260122-WA0000' etc.)
+      const searchPrefix = baseNameWithoutExtension.substring(0, 15); 
       
       const matchedFile = filesInDir.find(f => f.toLowerCase().startsWith(searchPrefix.toLowerCase()) && f.toLowerCase().endsWith(ext.toLowerCase()));
       if (matchedFile) {

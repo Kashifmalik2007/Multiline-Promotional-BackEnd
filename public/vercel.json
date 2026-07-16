@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://multiline-promotional-backend.onrender.com/api/:path*"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "https://multiline-promotional-backend.onrender.com/admin/:path*"
+    }
+  ]
+}

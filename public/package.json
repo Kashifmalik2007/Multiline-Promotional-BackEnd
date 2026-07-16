@@ -1,0 +1,22 @@
+{
+  "name": "multiline-promotional",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "db:init": "node init-db.js",
+    "db:check": "node checkdb.js"
+  },
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
+    "bcrypt": "^5.0.1",
+    "connect-pg-simple": "^10.0.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.0.1",
+    "express-session": "^1.18.2",
+    "pg": "^8.16.3",
+    "zod": "^3.25.76",
+    "zod-validation-error": "^3.4.0"
+  }
+}

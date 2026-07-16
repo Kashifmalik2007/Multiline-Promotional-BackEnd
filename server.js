@@ -47,52 +47,21 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'Public')));
 
-// ====== IMAGES & ASSETS FIX ======
+// 📂 ====== IMAGES & ATTACHED ASSETS ALIAS ======
+// Yeh code '/attached_assets/imagename.png' ko direct backend ke 'public/assets/' se uthaye ga!
+app.use('/attached_assets', express.static(path.join(__dirname, 'public', 'assets')));
+app.use('/attached_assets', express.static(path.join(__dirname, 'Public', 'assets')));
 app.use('/assets', express.static(path.join(__dirname, 'public', 'assets')));
-app.use('/assets', express.static(path.join(__dirname, 'Public', 'assets')));
-app.use('/assets', express.static(path.join(__dirname, 'public', 'Assets')));
-app.use('/assets', express.static(path.join(__dirname, 'Public', 'Assets')));
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
-// 🔍 SECRET ASSETS DEBUGGER (Yeh batayega ke folder mein kaunsi images hain)
-app.get('/debug-assets', (req, res) => {
-  const assetsPath = path.resolve(__dirname, 'public', 'assets');
-  const publicPath = path.resolve(__dirname, 'public');
-  
-  let assetsFiles = [];
-  let publicFiles = [];
-  
-  try {
-    if (fs.existsSync(publicPath)) {
-      publicFiles = fs.readdirSync(publicPath);
-    }
-    if (fs.existsSync(assetsPath)) {
-      assetsFiles = fs.readdirSync(assetsPath);
-    }
-    res.json({
-      message: "Assets Debugger is running!",
-      public_folder_exists: fs.existsSync(publicPath),
-      public_files: publicFiles,
-      assets_folder_exists: fs.existsSync(assetsPath),
-      assets_files: assetsFiles
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// 1. ADMIN LOGIN BULLETPROOF HANDLER
+// 🔑 ====== 1. ADMIN LOGIN BULLETPROOF HANDLER (Root folder support) ======
 app.get('/admin/login', (req, res) => {
   const possiblePaths = [
+    path.resolve(__dirname, 'admin', 'login.html'), // Root level (jahan abhi aapka folder hai)
     path.resolve(__dirname, 'public', 'admin', 'login.html'),
     path.resolve(__dirname, 'Public', 'admin', 'login.html'),
-    path.resolve(__dirname, 'public', 'Admin', 'login.html'),
-    path.resolve(__dirname, 'Public', 'Admin', 'login.html'),
-    path.resolve(__dirname, 'public', 'login.html'),
-    path.resolve(__dirname, 'Public', 'login.html'),
-    path.resolve(__dirname, 'admin', 'login.html'),
-    path.resolve(__dirname, 'login.html')
+    path.resolve(__dirname, 'public', 'login.html')
   ];
 
   let fileSent = false;
@@ -107,26 +76,17 @@ app.get('/admin/login', (req, res) => {
   }
 
   if (!fileSent) {
-    res.status(500).send(`
-      <div style="font-family: sans-serif; padding: 25px; border: 2px solid red; border-radius: 8px; max-width: 650px; margin: 50px auto;">
-        <h2 style="color: red; margin-top: 0;">Admin Login File Missing</h2>
-        <p>The system tried searching, but couldn't find login.html</p>
-      </div>
-    `);
+    res.status(500).send("Admin login.html file missing on server.");
   }
 });
 
-// 2. ADMIN DASHBOARD BULLETPROOF HANDLER
+// 📊 ====== 2. ADMIN DASHBOARD BULLETPROOF HANDLER ======
 app.get('/admin/dashboard', (req, res) => {
   const possiblePaths = [
+    path.resolve(__dirname, 'admin', 'dashboard.html'), // Root level
     path.resolve(__dirname, 'public', 'admin', 'dashboard.html'),
     path.resolve(__dirname, 'Public', 'admin', 'dashboard.html'),
-    path.resolve(__dirname, 'public', 'Admin', 'dashboard.html'),
-    path.resolve(__dirname, 'Public', 'Admin', 'dashboard.html'),
-    path.resolve(__dirname, 'public', 'dashboard.html'),
-    path.resolve(__dirname, 'Public', 'dashboard.html'),
-    path.resolve(__dirname, 'admin', 'dashboard.html'),
-    path.resolve(__dirname, 'dashboard.html')
+    path.resolve(__dirname, 'public', 'dashboard.html')
   ];
 
   let fileSent = false;
@@ -141,7 +101,7 @@ app.get('/admin/dashboard', (req, res) => {
   }
 
   if (!fileSent) {
-    res.status(500).send(`<h2>Admin Dashboard File Missing</h2>`);
+    res.status(500).send("Admin dashboard.html file missing on server.");
   }
 });
 

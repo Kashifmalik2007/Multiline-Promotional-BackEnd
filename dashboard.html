@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Multiline Promotional</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #070d19;
+      --bg-surface: #0f1c30;
+      --bg-card: #152744;
+      --primary: #FF6B00;
+      --primary-hover: #E05E00;
+      --accent-blue: #3B82F6;
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(255, 107, 0, 0.4);
+      --success: #10B981;
+      --danger: #EF4444;
+      
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(255, 107, 0, 0.05) 0px, transparent 40%),
+        radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 40%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Layout structure */
+    header {
+      background-color: rgba(15, 28, 48, 0.8);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand img {
+      height: 38px;
+    }
+
+    .brand h1 {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .brand span {
+      background-color: rgba(255, 107, 0, 0.15);
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(255, 107, 0, 0.2);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-color: var(--text-muted);
+    }
+
+    .btn-danger {
+      background-color: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-danger:hover {
+      background-color: var(--danger);
+      color: white;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 13px;
+      border-radius: 8px;
+    }
+
+    main {
+      flex: 1;
+      padding: 40px;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Summary KPI Cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .kpi-card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--border-color);
+    }
+
+    .kpi-card.kpi-primary::before {
+      background: var(--primary);
+    }
+
+    .kpi-card.kpi-blue::before {
+      background: var(--accent-blue);
+    }
+
+    .kpi-card.kpi-success::before {
+      background: var(--success);
+    }
+
+    .kpi-card h3 {
+      font-size: 13px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+
+    .kpi-card .value {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .kpi-card .subtext {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Product Section with search, categories, list */
+    .catalog-section {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+
+    .table-toolbar {
+      padding: 24px 32px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .search-filter-area {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      flex: 1;
+      max-width: 800px;
+    }
+
+    .input-group {
+      position: relative;
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      width: 18px;
+      height: 18px;
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      background-color: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 16px 12px 42px;
+      color: white;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--border-focus);
+    }
+
+    .select-input {
+      background-color: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 20px;
+      color: white;
+      font-size: 14px;
+      outline: none;
+      cursor: pointer;
+      min-width: 180px;
+      transition: all 0.2s;
+    }
+
+    .select-input:focus {
+      border-color: var(--primary);
+    }
+
+    /* Products Table */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      background-color: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 18px 32px;
+    }
+
+    td {
+      padding: 16px 32px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 14px;
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background-color: rgba(255, 255, 255, 0.01);
+    }
+
+    .prod-cell {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .prod-img {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      object-fit: cover;
+      background-color: #ffffff;
+      border: 1px solid var(--border-color);
+    }
+
+    .prod-name {
+      font-weight: 600;
+      font-size: 15px;
+      color: white;
+    }
+
+    .prod-sku {
+      font-family: monospace;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .ribbon-tag {
+      background-color: rgba(59, 130, 246, 0.15);
+      color: var(--accent-blue);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      width: fit-content;
+      text-transform: uppercase;
+    }
+
+    .ribbon-tag.featured {
+      background-color: rgba(255, 107, 0, 0.15);
+      color: var(--primary);
+    }
+
+    .spec-badge {
+      display: inline-block;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-right: 4px;
+      margin-bottom: 4px;
+    }
+
+    .actions-cell {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Modal dialog overlays */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 680px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+      animation: modalSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalSlide {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-header {
+      padding: 24px 32px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 24px;
+      transition: color 0.2s;
+    }
+
+    .close-btn:hover {
+      color: white;
+    }
+
+    .modal-body {
+      padding: 32px;
+    }
+
+    /* Form Grid */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .full-width {
+      grid-column: span 2;
+    }
+
+    .form-field {
+      margin-bottom: 18px;
+    }
+
+    .form-field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-field input[type="text"],
+    .form-field input[type="number"],
+    .form-field textarea,
+    .form-field select {
+      width: 100%;
+      background-color: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: white;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .form-field input:focus,
+    .form-field textarea:focus,
+    .form-field select:focus {
+      border-color: var(--primary);
+    }
+
+    /* Image upload section styling */
+    .upload-box {
+      border: 2px dashed var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      background-color: rgba(255,255,255,0.01);
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .upload-box:hover {
+      border-color: var(--primary);
+      background-color: rgba(255,107,0,0.02);
+    }
+
+    .upload-box svg {
+      width: 28px;
+      height: 28px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .upload-box p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .upload-box input[type="file"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .preview-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .upload-preview {
+      width: 60px;
+      height: 60px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 1px solid var(--border-color);
+      background-color: white;
+      display: none;
+    }
+
+    .preview-url {
+      font-size: 12px;
+      color: var(--text-muted);
+      word-break: break-all;
+      flex: 1;
+    }
+
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 32px;
+    }
+
+    .checkbox-container input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .modal-footer {
+      padding: 24px 32px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* Toast styling */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .toast {
+      background-color: var(--bg-surface);
+      border-left: 4px solid var(--primary);
+      border-right: 1px solid var(--border-color);
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      color: white;
+      border-radius: 8px;
+      padding: 16px 24px;
+      font-size: 14px;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 300px;
+      max-width: 450px;
+      transform: translateX(120%);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    .toast.success {
+      border-left-color: var(--success);
+    }
+
+    .toast.error {
+      border-left-color: var(--danger);
+    }
+
+    .empty-state {
+      padding: 60px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation bar -->
+  <header>
+    <div class="brand">
+      <img src="/assets/logo.png" alt="Multiline Logo" onerror="this.src='/favicon.png'">
+      <h1>Multiline Promotional</h1>
+      <span>Admin Control Panel</span>
+    </div>
+    <div class="nav-actions">
+      <a href="/" target="_blank" class="btn btn-secondary btn-sm">
+        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+        </svg>
+        View Website
+      </a>
+      <button class="btn btn-secondary btn-sm" onclick="openSettingsModal()">
+        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        </svg>
+        Settings
+      </button>
+      <a href="/admin/logout" class="btn btn-danger btn-sm">
+        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+        </svg>
+        Sign Out
+      </a>
+    </div>
+  </header>
+
+  <!-- Main section -->
+  <main>
+    <!-- Metrics Cards -->
+    <div class="summary-grid">
+      <div class="kpi-card kpi-primary">
+        <h3>Total Catalog Products</h3>
+        <div class="value" id="kpiTotal">0</div>
+        <div class="subtext">Active items in catalog database</div>
+      </div>
+      <div class="kpi-card kpi-blue">
+        <h3>Featured Products</h3>
+        <div class="value" id="kpiFeatured">0</div>
+        <div class="subtext">Displayed with high priority on site</div>
+      </div>
+      <div class="kpi-card kpi-success">
+        <h3>Global Settings Status</h3>
+        <div class="value" style="font-size: 20px; line-height: 48px;" id="kpiSettings">Active</div>
+        <div class="subtext" id="kpiSettingsSub">WhatsApp: Loaded • Email: Loaded</div>
+      </div>
+    </div>
+
+    <!-- Product Table Section -->
+    <div class="catalog-section">
+      <div class="table-toolbar">
+        <div class="search-filter-area">
+          <div class="input-group">
+            <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <input type="text" id="tableSearch" class="search-input" placeholder="Search products by name or SKU..." oninput="filterProducts()">
+          </div>
+          <select id="tableCategory" class="select-input" onchange="filterProducts()">
+            <option value="ALL">All Categories</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="openProductModal('add')">
+          <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Add Product
+        </button>
+      </div>
+
+      <div class="table-container">
+        <table id="productsTable">
+          <thead>
+            <tr>
+              <th>Product Details</th>
+              <th>SKU</th>
+              <th>Category</th>
+              <th>Min. Order</th>
+              <th>Specifications</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productsTableBody">
+            <!-- Dynamic rows inserted here -->
+          </tbody>
+        </table>
+        <div class="empty-state" id="emptyState" style="display: none;">
+          <h3>No products found</h3>
+          <p style="margin-top: 10px;">Try adjusting your filters or add a new product to get started.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Product Create / Edit Modal -->
+  <div class="modal-overlay" id="productModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Add New Product</h2>
+        <button class="close-btn" onclick="closeProductModal()">&times;</button>
+      </div>
+      <form id="productForm">
+        <input type="hidden" id="prodId">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-field full-width">
+              <label for="prodName">Product Name *</label>
+              <input type="text" id="prodName" required placeholder="e.g. Multiline Signature Pen">
+            </div>
+
+            <div class="form-field">
+              <label for="prodSku">SKU *</label>
+              <input type="text" id="prodSku" required placeholder="e.g. OFF-PEN-ML">
+            </div>
+
+            <div class="form-field">
+              <label for="prodCategory">Category / Ribbon Tag *</label>
+              <input type="text" id="prodCategory" required placeholder="e.g. Awards, Apparel, Corporate">
+            </div>
+
+            <div class="form-field">
+              <label for="prodMoq">Minimum Order Quantity *</label>
+              <input type="number" id="prodMoq" required min="1" placeholder="e.g. 100">
+            </div>
+
+            <div class="form-field">
+              <label for="prodPrice">Price (USD) *</label>
+              <input type="text" id="prodPrice" required placeholder="0.00" value="0.00">
+            </div>
+
+            <div class="form-field full-width">
+              <label for="prodDesc">Description *</label>
+              <textarea id="prodDesc" rows="4" required placeholder="Describe the product details, size, branding options, etc."></textarea>
+            </div>
+
+            <!-- Dynamic Specifications -->
+            <div class="form-field">
+              <label for="specType">Type Attribute</label>
+              <input type="text" id="specType" placeholder="e.g. Keychain, Pen, Clock">
+            </div>
+
+            <div class="form-field">
+              <label for="specMaterial">Material Attribute</label>
+              <input type="text" id="specMaterial" placeholder="e.g. Metal, PVC, Acrylic, Wood">
+            </div>
+
+            <!-- Image upload inputs -->
+            <div class="form-field">
+              <label>Main Product Image</label>
+              <div class="upload-box">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <p>Drag or click to upload</p>
+                <input type="file" id="uploadMainImg" accept="image/*" onchange="handleImageUpload(this, 'main')">
+              </div>
+              <div class="preview-container">
+                <img id="mainImgPreview" class="upload-preview" src="">
+                <span id="mainImgUrl" class="preview-url">No file chosen</span>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label>Product Thumbnail Image</label>
+              <div class="upload-box">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <p>Drag or click to upload</p>
+                <input type="file" id="uploadThumbImg" accept="image/*" onchange="handleImageUpload(this, 'thumb')">
+              </div>
+              <div class="preview-container">
+                <img id="thumbImgPreview" class="upload-preview" src="">
+                <span id="thumbImgUrl" class="preview-url">No file chosen</span>
+              </div>
+            </div>
+
+            <div class="checkbox-container full-width">
+              <input type="checkbox" id="prodIsFeatured">
+              <label for="prodIsFeatured" style="cursor: pointer; user-select: none;">Mark as Featured Product (displays at the top with a featured badge)</label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeProductModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveProductBtn">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2>Global Contact Settings</h2>
+        <button class="close-btn" onclick="closeSettingsModal()">&times;</button>
+      </div>
+      <form id="settingsForm">
+        <div class="modal-body">
+          <div class="form-field">
+            <label for="settingsWhatsapp">WhatsApp Contact Number</label>
+            <input type="text" id="settingsWhatsapp" required placeholder="e.g. 923004303949">
+            <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Use international format without '+' sign, e.g. 923004303949</p>
+          </div>
+          <div class="form-field" style="margin-top: 20px;">
+            <label for="settingsEmail">Notification Email Address</label>
+            <input type="email" id="settingsEmail" required placeholder="e.g. recipient@domain.com">
+            <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Destination address for new Quote Requests and Contact messages</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeSettingsModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Settings</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification List -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    let allProducts = [];
+    let categoriesList = [];
+
+    // On Load
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchProducts();
+      fetchSettings();
+    });
+
+    // Toast helper
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      
+      const svgSuccess = '<svg style="width: 20px; height: 20px; color:#10B981;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+      const svgError = '<svg style="width: 20px; height: 20px; color:#EF4444;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+      
+      toast.innerHTML = `
+        ${type === 'success' ? svgSuccess : svgError}
+        <span>${message}</span>
+      `;
+      
+      container.appendChild(toast);
+      
+      // Trigger animation
+      setTimeout(() => toast.classList.add('show'), 50);
+      
+      // Remove toast
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400);
+      }, 3500);
+    }
+
+    // Fetch Products from Backend
+    async function fetchProducts() {
+      try {
+        const response = await fetch('/api/admin/products');
+        if (!response.ok) throw new Error('Unauthorized or request failed.');
+        
+        allProducts = await response.json();
+        
+        // Update stats
+        document.getElementById('kpiTotal').textContent = allProducts.length;
+        const featuredCount = allProducts.filter(p => p.isFeatured).length;
+        document.getElementById('kpiFeatured').textContent = featuredCount;
+        
+        // Populate Categories Filter
+        const categoriesSet = new Set(allProducts.map(p => p.category).filter(Boolean));
+        categoriesList = Array.from(categoriesSet).sort();
+        
+        const catSelect = document.getElementById('tableCategory');
+        // Clear previous options except "ALL"
+        catSelect.innerHTML = '<option value="ALL">All Categories</option>';
+        categoriesList.forEach(cat => {
+          const opt = document.createElement('option');
+          opt.value = cat;
+          opt.textContent = cat;
+          catSelect.appendChild(opt);
+        });
+
+        renderProducts(allProducts);
+      } catch (err) {
+        console.error('Error fetching products:', err);
+        showToast('Failed to load products. Please refresh.', 'error');
+      }
+    }
+
+    // Fetch Settings
+    async function fetchSettings() {
+      try {
+        const response = await fetch('/api/admin/settings');
+        if (response.ok) {
+          const settings = await response.json();
+          document.getElementById('kpiSettingsSub').textContent = `WhatsApp: ${settings.whatsapp} • Email: ${settings.email}`;
+        }
+      } catch (err) {
+        console.error('Failed to load settings', err);
+      }
+    }
+
+    // Render products in the table
+    function renderProducts(products) {
+      const tbody = document.getElementById('productsTableBody');
+      const emptyState = document.getElementById('emptyState');
+      tbody.innerHTML = '';
+      
+      if (products.length === 0) {
+        emptyState.style.display = 'block';
+        return;
+      }
+      
+      emptyState.style.display = 'none';
+      
+      products.forEach(p => {
+        const tr = document.createElement('tr');
+        
+        // Product Details cell
+        const detailsCell = `
+          <div class="prod-cell">
+            <img src="${p.imageUrl}" alt="${p.name}" class="prod-img" onerror="this.src='/favicon.png'">
+            <div>
+              <div class="prod-name">${p.name}</div>
+              <div class="prod-sku">SKU: ${p.sku}</div>
+            </div>
+          </div>
+        `;
+        
+        // Ribbon / Tag cell
+        let tagHtml = `<div class="ribbon-tag">${p.category}</div>`;
+        if (p.isFeatured) {
+          tagHtml += ` <div class="ribbon-tag featured" style="margin-top: 4px;">FEATURED</div>`;
+        }
+
+        // Specs cell
+        let specsHtml = '';
+        if (p.specifications) {
+          Object.entries(p.specifications).forEach(([k, v]) => {
+            specsHtml += `<span class="spec-badge">${k}: ${v}</span>`;
+          });
+        }
+        if (!specsHtml) specsHtml = '<span class="spec-badge">None</span>';
+        
+        tr.innerHTML = `
+          <td>${detailsCell}</td>
+          <td style="font-family: monospace; font-size: 13px;">${p.sku}</td>
+          <td><div style="display:flex; flex-direction:column;">${tagHtml}</div></td>
+          <td style="font-weight: 500;">${p.moq} units</td>
+          <td>${specsHtml}</td>
+          <td>
+            <div class="actions-cell">
+              <button class="btn btn-secondary btn-sm" onclick="openProductModal('edit', ${p.id})">Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id}, '${p.name.replace(/'/g, "\\'")}')">Delete</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Filter and search products
+    function filterProducts() {
+      const query = document.getElementById('tableSearch').value.toLowerCase().trim();
+      const category = document.getElementById('tableCategory').value;
+      
+      const filtered = allProducts.filter(p => {
+        const matchesQuery = p.name.toLowerCase().includes(query) || p.sku.toLowerCase().includes(query);
+        const matchesCategory = (category === 'ALL') || (p.category === category);
+        return matchesQuery && matchesCategory;
+      });
+      
+      renderProducts(filtered);
+    }
+
+    // Open Add / Edit Modal
+    function openProductModal(mode, productId = null) {
+      const modal = document.getElementById('productModal');
+      const form = document.getElementById('productForm');
+      
+      form.reset();
+      
+      // Reset previews
+      document.getElementById('mainImgPreview').style.display = 'none';
+      document.getElementById('mainImgUrl').textContent = 'No file chosen';
+      document.getElementById('thumbImgPreview').style.display = 'none';
+      document.getElementById('thumbImgUrl').textContent = 'No file chosen';
+      
+      if (mode === 'add') {
+        document.getElementById('modalTitle').textContent = 'Add New Product';
+        document.getElementById('prodId').value = '';
+        document.getElementById('prodSku').disabled = false;
+      } else {
+        document.getElementById('modalTitle').textContent = 'Edit Product';
+        const p = allProducts.find(item => item.id === productId);
+        if (!p) return;
+        
+        document.getElementById('prodId').value = p.id;
+        document.getElementById('prodName').value = p.name;
+        document.getElementById('prodSku').value = p.sku;
+        document.getElementById('prodSku').disabled = true; // SKU usually shouldn't be edited
+        document.getElementById('prodCategory').value = p.category;
+        document.getElementById('prodMoq').value = p.moq;
+        document.getElementById('prodPrice').value = p.price || '0.00';
+        document.getElementById('prodDesc').value = p.description;
+        document.getElementById('prodIsFeatured').checked = p.isFeatured;
+        
+        if (p.specifications) {
+          document.getElementById('specType').value = p.specifications.type || p.specifications.Type || '';
+          document.getElementById('specMaterial').value = p.specifications.material || p.specifications.Material || '';
+        }
+
+        if (p.imageUrl) {
+          document.getElementById('mainImgUrl').textContent = p.imageUrl;
+          document.getElementById('mainImgPreview').src = p.imageUrl;
+          document.getElementById('mainImgPreview').style.display = 'block';
+          
+          document.getElementById('thumbImgUrl').textContent = p.imageUrl;
+          document.getElementById('thumbImgPreview').src = p.imageUrl;
+          document.getElementById('thumbImgPreview').style.display = 'block';
+        }
+      }
+      
+      modal.style.display = 'flex';
+    }
+
+    // Close Modal
+    function closeProductModal() {
+      document.getElementById('productModal').style.display = 'none';
+    }
+
+    // Handle Image Upload File selection and Base64 Conversion
+    function handleImageUpload(input, type) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const previewImg = document.getElementById(type === 'main' ? 'mainImgPreview' : 'thumbImgPreview');
+      const urlSpan = document.getElementById(type === 'main' ? 'mainImgUrl' : 'thumbImgUrl');
+
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const fileData = reader.result; // Base64 Data URL
+        
+        // Show indicator in text field
+        urlSpan.textContent = 'Uploading...';
+        
+        try {
+          const response = await fetch('/api/admin/upload', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              filename: file.name,
+              fileData: fileData
+            })
+          });
+
+          const data = await response.json();
+          if (response.ok && data.url) {
+            urlSpan.textContent = data.url;
+            previewImg.src = data.url;
+            previewImg.style.display = 'block';
+            showToast('Image uploaded successfully.');
+          } else {
+            urlSpan.textContent = 'Upload failed';
+            showToast(data.message || 'Image upload failed.', 'error');
+          }
+        } catch (err) {
+          console.error('Upload error:', err);
+          urlSpan.textContent = 'Upload error';
+          showToast('Image upload failed due to network error.', 'error');
+        }
+      };
+      
+      reader.readAsDataURL(file);
+    }
+
+    // Submit Product Form
+    document.getElementById('productForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const id = document.getElementById('prodId').value;
+      const isEdit = id !== '';
+      
+      // Get URLs
+      const mainUrl = document.getElementById('mainImgUrl').textContent;
+      const imageUrl = (mainUrl && mainUrl !== 'No file chosen' && mainUrl !== 'Uploading...') ? mainUrl : '/assets/logo.png';
+      
+      // Format Specifications JSONB
+      const specifications = {};
+      const typeVal = document.getElementById('specType').value.trim();
+      const matVal = document.getElementById('specMaterial').value.trim();
+      if (typeVal) specifications.type = typeVal;
+      if (matVal) specifications.material = matVal;
+
+      const productPayload = {
+        name: document.getElementById('prodName').value.trim(),
+        sku: document.getElementById('prodSku').value.trim(),
+        category: document.getElementById('prodCategory').value.trim(),
+        moq: parseInt(document.getElementById('prodMoq').value, 10),
+        price: document.getElementById('prodPrice').value.trim() || '0.00',
+        description: document.getElementById('prodDesc').value.trim(),
+        imageUrl: imageUrl,
+        isFeatured: document.getElementById('prodIsFeatured').checked,
+        colors: ['Custom'],
+        specifications: specifications
+      };
+
+      try {
+        const url = isEdit ? `/api/admin/products/${id}` : '/api/admin/products';
+        const method = isEdit ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(productPayload)
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+          showToast(isEdit ? 'Product updated successfully.' : 'Product created successfully.');
+          closeProductModal();
+          fetchProducts();
+        } else {
+          showToast(data.message || 'Failed to save product.', 'error');
+        }
+      } catch (err) {
+        console.error('Error saving product:', err);
+        showToast('Network error saving product.', 'error');
+      }
+    });
+
+    // Delete Product
+    async function deleteProduct(id, name) {
+      if (!confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`)) {
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/api/admin/products/${id}`, {
+          method: 'DELETE'
+        });
+        
+        const data = await response.json();
+        if (response.ok) {
+          showToast('Product deleted successfully.');
+          fetchProducts();
+        } else {
+          showToast(data.message || 'Failed to delete product.', 'error');
+        }
+      } catch (err) {
+        console.error('Delete error:', err);
+        showToast('Network error deleting product.', 'error');
+      }
+    }
+
+    // Settings Modal
+    function openSettingsModal() {
+      // Fetch settings first to prefill
+      fetch('/api/admin/settings')
+        .then(res => res.json())
+        .then(settings => {
+          document.getElementById('settingsWhatsapp').value = settings.whatsapp;
+          document.getElementById('settingsEmail').value = settings.email;
+          document.getElementById('settingsModal').style.display = 'flex';
+        })
+        .catch(err => {
+          showToast('Failed to load current settings.', 'error');
+        });
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settingsModal').style.display = 'none';
+    }
+
+    // Save Settings
+    document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const whatsapp = document.getElementById('settingsWhatsapp').value.trim();
+      const email = document.getElementById('settingsEmail').value.trim();
+
+      try {
+        const response = await fetch('/api/admin/settings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ whatsapp, email })
+        });
+        
+        const data = await response.json();
+        if (response.ok) {
+          showToast('Settings saved successfully.');
+          closeSettingsModal();
+          fetchSettings();
+        } else {
+          showToast(data.message || 'Failed to save settings.', 'error');
+        }
+      } catch (err) {
+        console.error('Settings save error:', err);
+        showToast('Network error saving settings.', 'error');
+      }
+    });
+  </script>
+</body>
+</html>

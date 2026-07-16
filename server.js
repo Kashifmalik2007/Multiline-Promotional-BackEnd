@@ -41,23 +41,28 @@ app.use(session({
     maxAge: 1000 * 60 * 60 * 24 * 7
   }
 }));
+
+// Yahan static public folder ka link set hai
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
 adminRouter(app);
 
+// YEH WALA BLOCK CHANGE KIYA HAI
 app.use((req, res) => {
-  // Agar koi api request ho jo galat ho, to 404 error do
+  // Agar koi galat api request ho to 404 do
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ message: 'Route not found.' });
   }
-  // Baki saari requests ko Vercel ke link par redirect kar do
-  return res.redirect('https://multiline-promotional-front-1peotvhbm-multiline-promotional.vercel.app');
+  // Baki saari requests par ab redirect nahi hoga, balki direct public folder ki index.html file load hogi
+  return res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+
 async function start() {
   try {
     const client = await pool.connect();
+    const result = await client.query('SELECT NOW()');
     client.release();
     console.log('Database Connected');
   } catch (error) {

@@ -42,20 +42,31 @@ app.use(session({
   }
 }));
 
-// Yahan static public folder ka link set hai
+// Static files serve karne ke liye index configuration
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
+// 1. ADMIN LOGIN DIRECT HANDLER (Server-level bypass)
+app.get('/admin/login', (req, res) => {
+  return res.sendFile(path.join(__dirname, 'public', 'admin', 'login.html'));
+});
+
+// 2. ADMIN DASHBOARD DIRECT HANDLER
+app.get('/admin/dashboard', (req, res) => {
+  return res.sendFile(path.join(__dirname, 'public', 'admin', 'dashboard.html'));
+});
+
+// Admin panel custom backend routes loader
 adminRouter(app);
 
-// YEH WALA BLOCK CHANGE KIYA HAI
+// Global fallback handler for index and other assets
 app.use((req, res) => {
   // Agar koi galat api request ho to 404 do
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ message: 'Route not found.' });
   }
-  // Baki saari requests par ab redirect nahi hoga, balki direct public folder ki index.html file load hogi
+  // Baki saari requests par index.html default load hogi
   return res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 

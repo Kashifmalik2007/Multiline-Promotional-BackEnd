@@ -47,7 +47,7 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'Public')));
 
-// ====== IMAGES & ASSETS FIX (YAHAN EXPLICIT MAPPING ADD KI HAI) ======
+// ====== IMAGES & ASSETS FIX ======
 app.use('/assets', express.static(path.join(__dirname, 'public', 'assets')));
 app.use('/assets', express.static(path.join(__dirname, 'Public', 'assets')));
 app.use('/assets', express.static(path.join(__dirname, 'public', 'Assets')));
@@ -55,7 +55,34 @@ app.use('/assets', express.static(path.join(__dirname, 'Public', 'Assets')));
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
-// 1. ADMIN LOGIN BULLETPROOF HANDLER (Automatic multiple path detection)
+// 🔍 SECRET ASSETS DEBUGGER (Yeh batayega ke folder mein kaunsi images hain)
+app.get('/debug-assets', (req, res) => {
+  const assetsPath = path.resolve(__dirname, 'public', 'assets');
+  const publicPath = path.resolve(__dirname, 'public');
+  
+  let assetsFiles = [];
+  let publicFiles = [];
+  
+  try {
+    if (fs.existsSync(publicPath)) {
+      publicFiles = fs.readdirSync(publicPath);
+    }
+    if (fs.existsSync(assetsPath)) {
+      assetsFiles = fs.readdirSync(assetsPath);
+    }
+    res.json({
+      message: "Assets Debugger is running!",
+      public_folder_exists: fs.existsSync(publicPath),
+      public_files: publicFiles,
+      assets_folder_exists: fs.existsSync(assetsPath),
+      assets_files: assetsFiles
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 1. ADMIN LOGIN BULLETPROOF HANDLER
 app.get('/admin/login', (req, res) => {
   const possiblePaths = [
     path.resolve(__dirname, 'public', 'admin', 'login.html'),
@@ -76,20 +103,14 @@ app.get('/admin/login', (req, res) => {
         fileSent = true;
         break;
       }
-    } catch (e) {
-      // Quietly try next path
-    }
+    } catch (e) {}
   }
 
   if (!fileSent) {
     res.status(500).send(`
-      <div style="font-family: sans-serif; padding: 25px; border: 2px solid red; border-radius: 8px; max-width: 650px; margin: 50px auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+      <div style="font-family: sans-serif; padding: 25px; border: 2px solid red; border-radius: 8px; max-width: 650px; margin: 50px auto;">
         <h2 style="color: red; margin-top: 0;">Admin Login File Missing</h2>
-        <p>The system tried searching in all these locations on Render server, but couldn't find the file:</p>
-        <ul style="background: #f4f4f4; padding: 15px 15px 15px 30px; border-radius: 5px; font-family: monospace; font-size: 13px; line-height: 1.6;">
-          ${possiblePaths.map(p => `<li>${p}</li>`).join('')}
-        </ul>
-        <p style="margin-top: 15px;"><b>How to fix this?</b> Please ensure that <code>login.html</code> exists inside your GitHub repo <code>Multiline-Promotional-BackEnd</code> under the folder structure <b>public/admin/login.html</b>.</p>
+        <p>The system tried searching, but couldn't find login.html</p>
       </div>
     `);
   }
@@ -116,21 +137,11 @@ app.get('/admin/dashboard', (req, res) => {
         fileSent = true;
         break;
       }
-    } catch (e) {
-      // Quietly try next path
-    }
+    } catch (e) {}
   }
 
   if (!fileSent) {
-    res.status(500).send(`
-      <div style="font-family: sans-serif; padding: 25px; border: 2px solid red; border-radius: 8px; max-width: 650px; margin: 50px auto;">
-        <h2 style="color: red; margin-top: 0;">Admin Dashboard File Missing</h2>
-        <p>The system tried searching in all these locations on Render server, but couldn't find the file:</p>
-        <ul style="background: #f4f4f4; padding: 15px 15px 15px 30px; border-radius: 5px; font-family: monospace; font-size: 13px; line-height: 1.6;">
-          ${possiblePaths.map(p => `<li>${p}</li>`).join('')}
-        </ul>
-      </div>
-    `);
+    res.status(500).send(`<h2>Admin Dashboard File Missing</h2>`);
   }
 });
 
@@ -143,7 +154,6 @@ app.use((req, res) => {
     return res.status(404).json({ message: 'Route not found.' });
   }
   
-  // Try public/index.html first, then Public/index.html
   const indexPaths = [
     path.resolve(__dirname, 'public', 'index.html'),
     path.resolve(__dirname, 'Public', 'index.html')

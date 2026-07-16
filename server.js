@@ -43,23 +43,30 @@ app.use(session({
   }
 }));
 
-// 📂 ====== IMAGES & ATTACHED ASSETS FIX ======
-// Note: Folder ka asli naam 'attached_assets' hai, isliye hum use explicit paths ke sath pehle load kar rahe hain!
+// ==========================================
+// 📂 PRIORITY 1: IMAGES & STATIC ASSETS SERVING
+// ==========================================
+// Taake images bina fallback block ke direct load ho sakein
 app.use('/attached_assets', express.static(path.join(__dirname, 'public', 'attached_assets')));
 app.use('/attached_assets', express.static(path.join(__dirname, 'Public', 'attached_assets')));
 app.use('/assets', express.static(path.join(__dirname, 'public', 'attached_assets')));
 app.use('/assets', express.static(path.join(__dirname, 'Public', 'attached_assets')));
 
-// Static files serve karne ke liye standard paths
+// Baki normal assets (JS, CSS) ke liye static directories
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'Public')));
 
+// Root level 'admin' folder ko static serve karna (css/js files load karne ke liye)
+app.use('/admin', express.static(path.join(__dirname, 'admin')));
+
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
-// 🔑 ====== 1. ADMIN LOGIN BULLETPROOF HANDLER (Root level support) ======
+// ==========================================
+// 🔑 PRIORITY 2: ADMIN PANEL HANDLERS
+// ==========================================
 app.get('/admin/login', (req, res) => {
   const possiblePaths = [
-    path.resolve(__dirname, 'admin', 'login.html'), // Root level jahan abhi aapka folder hai
+    path.resolve(__dirname, 'admin', 'login.html'), // Root level
     path.resolve(__dirname, 'public', 'admin', 'login.html'),
     path.resolve(__dirname, 'Public', 'admin', 'login.html'),
     path.resolve(__dirname, 'public', 'login.html')
@@ -81,7 +88,6 @@ app.get('/admin/login', (req, res) => {
   }
 });
 
-// 📊 ====== 2. ADMIN DASHBOARD BULLETPROOF HANDLER ======
 app.get('/admin/dashboard', (req, res) => {
   const possiblePaths = [
     path.resolve(__dirname, 'admin', 'dashboard.html'), // Root level
@@ -106,13 +112,20 @@ app.get('/admin/dashboard', (req, res) => {
   }
 });
 
-// Admin panel custom backend routes loader
+// Admin panel backend API routes loader
 adminRouter(app);
 
-// Global fallback handler for index and other assets
+// ==========================================
+// 🌐 PRIORITY 3: GLOBAL FALLBACK (For React/SPA)
+// ==========================================
 app.use((req, res) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ message: 'Route not found.' });
+  }
+
+  // Toote hue images ya assets ko ghalti se html serve hone se rokne ke liye
+  if (req.path.match(/\.(png|jpe?g|gif|svg|ico|css|js)$/)) {
+    return res.status(404).send("File not found");
   }
   
   const indexPaths = [

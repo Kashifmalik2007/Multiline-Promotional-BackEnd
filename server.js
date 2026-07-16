@@ -44,7 +44,7 @@ app.use(session({
 }));
 
 // ==========================================
-// 📂 PRIORITY 1: DYNAMIC FUZZY IMAGE MATCHING (SUPER SOLID HASH BYPASS)
+// 📂 PRIORITY 1: DYNAMIC FUZZY IMAGE MATCHING (HASH BYPASS)
 // ==========================================
 app.get(['/attached_assets/:filename', '/assets/:filename'], (req, res, next) => {
   const originalFilename = req.params.filename;
@@ -59,7 +59,7 @@ app.get(['/attached_assets/:filename', '/assets/:filename'], (req, res, next) =>
   for (const dir of possibleDirs) {
     if (!fs.existsSync(dir)) continue;
 
-    // 1. Pehle exact filename (e.g. logo-ByB_YmiT.png) check karein
+    // 1. Pehle exact filename (jo HTML mang raha hai, e.g. with -ByB_YmiT) check karein
     const exactPath = path.join(dir, originalFilename);
     if (fs.existsSync(exactPath)) {
       res.sendFile(exactPath);
@@ -67,8 +67,7 @@ app.get(['/attached_assets/:filename', '/assets/:filename'], (req, res, next) =>
       break;
     }
 
-    // 2. Agar exact nahi mili, to Vite ka dynamic hash (jaise -ByB_YmiT) saaf kar ke check karein
-    // Yeh regex filename ke end se hyphens aur character-based hash codes ko khatam karega
+    // 2. Agar exact nahi milti, to Vite ka hash (-ByB_YmiT ya koi bhi aur hash) saaf kar ke check karein
     const cleanFilename = originalFilename.replace(/-[a-zA-Z0-9_]{5,15}\.(png|jpe?g|gif|svg|webp)$/i, '.$1');
     const cleanPath = path.join(dir, cleanFilename);
 
@@ -78,33 +77,32 @@ app.get(['/attached_assets/:filename', '/assets/:filename'], (req, res, next) =>
       break;
     }
 
-    // 3. AGAR PHIR BHI NA MILE (Deep Scan): Prefix base par auto-match dhoondein
-    // (Jaise '1768642225523...' ke start ki matching file dhoondna)
+    // 3. AGAR PHIR BHI NA MILE (Deep Prefix Matching for specific files like Crops/Monuments)
     try {
       const filesInDir = fs.readdirSync(dir);
       const ext = path.extname(originalFilename);
       const baseNameWithoutExtension = path.basename(originalFilename, ext);
       
-      // Filename ka pehla 15-20 char prefix nikalte hain (jisme timestamp hota hai)
+      // Prefix match karein (pehla 15-18 characters, jaise '4_CROPS_MONUMENTS_176942...')
       const searchPrefix = baseNameWithoutExtension.substring(0, 18); 
       
-      const matchedFile = filesInDir.find(f => f.startsWith(searchPrefix) && f.endsWith(ext));
+      const matchedFile = filesInDir.find(f => f.toLowerCase().startsWith(searchPrefix.toLowerCase()) && f.toLowerCase().endsWith(ext.toLowerCase()));
       if (matchedFile) {
         res.sendFile(path.join(dir, matchedFile));
         fileServed = true;
         break;
       }
     } catch (err) {
-      console.error("Deep Scan Failed:", err);
+      console.error("Deep Scan Matching Failed:", err);
     }
   }
 
   if (!fileServed) {
-    next(); // Agar bilkul na mile to standard flow par bhej do
+    next();
   }
 });
 
-// Normal assets (JS, CSS) ke liye standard configurations
+// Normal static configurations
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'Public')));
 
@@ -118,7 +116,7 @@ app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 // ==========================================
 app.get('/admin/login', (req, res) => {
   const possiblePaths = [
-    path.resolve(__dirname, 'admin', 'login.html'), // Root level
+    path.resolve(__dirname, 'admin', 'login.html'),
     path.resolve(__dirname, 'public', 'admin', 'login.html'),
     path.resolve(__dirname, 'Public', 'admin', 'login.html'),
     path.resolve(__dirname, 'public', 'login.html')
@@ -142,7 +140,7 @@ app.get('/admin/login', (req, res) => {
 
 app.get('/admin/dashboard', (req, res) => {
   const possiblePaths = [
-    path.resolve(__dirname, 'admin', 'dashboard.html'), // Root level
+    path.resolve(__dirname, 'admin', 'dashboard.html'),
     path.resolve(__dirname, 'public', 'admin', 'dashboard.html'),
     path.resolve(__dirname, 'Public', 'admin', 'dashboard.html'),
     path.resolve(__dirname, 'public', 'dashboard.html')
@@ -175,7 +173,7 @@ app.use((req, res) => {
     return res.status(404).json({ message: 'Route not found.' });
   }
 
-  // Toote hue direct assets ko ghalti se index.html serve hone se rokne ke liye 404 block
+  // Toote hue images ya direct assets ko html render hone se rokne ke liye custom 404
   if (req.path.match(/\.(png|jpe?g|gif|svg|ico|css|js)$/)) {
     return res.status(404).send("File not found");
   }

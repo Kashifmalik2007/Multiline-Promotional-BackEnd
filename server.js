@@ -47,14 +47,39 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
-// 1. ADMIN LOGIN DIRECT HANDLER (Server-level bypass)
+// 1. ADMIN LOGIN DIRECT HANDLER (Absolute path mapping with fallback reporting)
 app.get('/admin/login', (req, res) => {
-  return res.sendFile(path.join(__dirname, 'public', 'admin', 'login.html'));
+  const loginPath = path.resolve(__dirname, 'public', 'admin', 'login.html');
+  res.sendFile(loginPath, (err) => {
+    if (err) {
+      console.error("[Admin Error] Login file not found at:", loginPath);
+      res.status(500).send(`
+        <div style="font-family: sans-serif; padding: 20px; border: 2px solid red; border-radius: 5px; max-width: 600px; margin: 50px auto;">
+          <h2 style="color: red;">Admin Login File Missing</h2>
+          <p>The backend could not find the file at this location:</p>
+          <code style="background: #f4f4f4; padding: 5px 10px; display: block; word-break: break-all;">${loginPath}</code>
+          <p style="margin-top: 15px;"><b>Solution:</b> Please verify that inside your GitHub repository <code>Multiline-Promotional-BackEnd</code>, you have created a folder named <b>public</b>, inside it a folder named <b>admin</b>, and uploaded <b>login.html</b> there.</p>
+        </div>
+      `);
+    }
+  });
 });
 
 // 2. ADMIN DASHBOARD DIRECT HANDLER
 app.get('/admin/dashboard', (req, res) => {
-  return res.sendFile(path.join(__dirname, 'public', 'admin', 'dashboard.html'));
+  const dashboardPath = path.resolve(__dirname, 'public', 'admin', 'dashboard.html');
+  res.sendFile(dashboardPath, (err) => {
+    if (err) {
+      console.error("[Admin Error] Dashboard file not found at:", dashboardPath);
+      res.status(500).send(`
+        <div style="font-family: sans-serif; padding: 20px; border: 2px solid red; border-radius: 5px; max-width: 600px; margin: 50px auto;">
+          <h2 style="color: red;">Admin Dashboard File Missing</h2>
+          <p>The backend could not find the file at this location:</p>
+          <code style="background: #f4f4f4; padding: 5px 10px; display: block; word-break: break-all;">${dashboardPath}</code>
+        </div>
+      `);
+    }
+  });
 });
 
 // Admin panel custom backend routes loader
@@ -66,7 +91,7 @@ app.use((req, res) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ message: 'Route not found.' });
   }
-  // Baki saari requests par index.html default load hogi
+  // Baki saari requests par index.html default load ہوگی
   return res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 

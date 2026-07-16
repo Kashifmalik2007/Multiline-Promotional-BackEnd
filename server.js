@@ -44,14 +44,11 @@ app.use(session({
 }));
 
 // ==========================================
-// 📂 PRIORITY 1: DYNAMIC FUZZY IMAGE MATCHING (HASH BYPASS)
+// 📂 PRIORITY 1: DYNAMIC FUZZY IMAGE MATCHING (SUPER SOLID HASH BYPASS)
 // ==========================================
-// Agar user dynamic hash (e.g., logo-ByB_YmiT.png) ke sath request karega,
-// to yeh logic automatically hash remove kar ke sahi file serve karega.
 app.get(['/attached_assets/:filename', '/assets/:filename'], (req, res, next) => {
   const originalFilename = req.params.filename;
   
-  // Dono possible folders check karenge (capital 'P' aur small 'p')
   const possibleDirs = [
     path.join(__dirname, 'public', 'attached_assets'),
     path.join(__dirname, 'Public', 'attached_assets')
@@ -62,7 +59,7 @@ app.get(['/attached_assets/:filename', '/assets/:filename'], (req, res, next) =>
   for (const dir of possibleDirs) {
     if (!fs.existsSync(dir)) continue;
 
-    // 1. Pehle check karein agar exact filename (jo HTML mang raha hai) mojood hai
+    // 1. Pehle exact filename (e.g. logo-ByB_YmiT.png) check karein
     const exactPath = path.join(dir, originalFilename);
     if (fs.existsSync(exactPath)) {
       res.sendFile(exactPath);
@@ -70,8 +67,9 @@ app.get(['/attached_assets/:filename', '/assets/:filename'], (req, res, next) =>
       break;
     }
 
-    // 2. Agar exact nahi mili, to aakhir se Vite/Build ka hash (e.g., -ByB_YmiT) mita kar dhoondein
-    const cleanFilename = originalFilename.replace(/-[a-zA-Z0-9_]+\.(png|jpe?g|gif|svg|webp)$/i, '.$1');
+    // 2. Agar exact nahi mili, to Vite ka dynamic hash (jaise -ByB_YmiT) saaf kar ke check karein
+    // Yeh regex filename ke end se hyphens aur character-based hash codes ko khatam karega
+    const cleanFilename = originalFilename.replace(/-[a-zA-Z0-9_]{5,15}\.(png|jpe?g|gif|svg|webp)$/i, '.$1');
     const cleanPath = path.join(dir, cleanFilename);
 
     if (fs.existsSync(cleanPath)) {
@@ -79,10 +77,30 @@ app.get(['/attached_assets/:filename', '/assets/:filename'], (req, res, next) =>
       fileServed = true;
       break;
     }
+
+    // 3. AGAR PHIR BHI NA MILE (Deep Scan): Prefix base par auto-match dhoondein
+    // (Jaise '1768642225523...' ke start ki matching file dhoondna)
+    try {
+      const filesInDir = fs.readdirSync(dir);
+      const ext = path.extname(originalFilename);
+      const baseNameWithoutExtension = path.basename(originalFilename, ext);
+      
+      // Filename ka pehla 15-20 char prefix nikalte hain (jisme timestamp hota hai)
+      const searchPrefix = baseNameWithoutExtension.substring(0, 18); 
+      
+      const matchedFile = filesInDir.find(f => f.startsWith(searchPrefix) && f.endsWith(ext));
+      if (matchedFile) {
+        res.sendFile(path.join(dir, matchedFile));
+        fileServed = true;
+        break;
+      }
+    } catch (err) {
+      console.error("Deep Scan Failed:", err);
+    }
   }
 
   if (!fileServed) {
-    next(); // Agar kahin bhi nahi milti to standard flow par jane dein
+    next(); // Agar bilkul na mile to standard flow par bhej do
   }
 });
 
@@ -90,7 +108,7 @@ app.get(['/attached_assets/:filename', '/assets/:filename'], (req, res, next) =>
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'Public')));
 
-// Root level 'admin' folder ko static serve karna (admin panel ki stylesheet wagera load karne ke liye)
+// Root level 'admin' folder ko static serve karna
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));

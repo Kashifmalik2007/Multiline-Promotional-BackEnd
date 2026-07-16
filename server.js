@@ -44,19 +44,53 @@ app.use(session({
 }));
 
 // ==========================================
-// 📂 PRIORITY 1: IMAGES & STATIC ASSETS SERVING
+// 📂 PRIORITY 1: DYNAMIC FUZZY IMAGE MATCHING (HASH BYPASS)
 // ==========================================
-// Taake images bina fallback block ke direct load ho sakein
-app.use('/attached_assets', express.static(path.join(__dirname, 'public', 'attached_assets')));
-app.use('/attached_assets', express.static(path.join(__dirname, 'Public', 'attached_assets')));
-app.use('/assets', express.static(path.join(__dirname, 'public', 'attached_assets')));
-app.use('/assets', express.static(path.join(__dirname, 'Public', 'attached_assets')));
+// Agar user dynamic hash (e.g., logo-ByB_YmiT.png) ke sath request karega,
+// to yeh logic automatically hash remove kar ke sahi file serve karega.
+app.get(['/attached_assets/:filename', '/assets/:filename'], (req, res, next) => {
+  const originalFilename = req.params.filename;
+  
+  // Dono possible folders check karenge (capital 'P' aur small 'p')
+  const possibleDirs = [
+    path.join(__dirname, 'public', 'attached_assets'),
+    path.join(__dirname, 'Public', 'attached_assets')
+  ];
 
-// Baki normal assets (JS, CSS) ke liye static directories
+  let fileServed = false;
+
+  for (const dir of possibleDirs) {
+    if (!fs.existsSync(dir)) continue;
+
+    // 1. Pehle check karein agar exact filename (jo HTML mang raha hai) mojood hai
+    const exactPath = path.join(dir, originalFilename);
+    if (fs.existsSync(exactPath)) {
+      res.sendFile(exactPath);
+      fileServed = true;
+      break;
+    }
+
+    // 2. Agar exact nahi mili, to aakhir se Vite/Build ka hash (e.g., -ByB_YmiT) mita kar dhoondein
+    const cleanFilename = originalFilename.replace(/-[a-zA-Z0-9_]+\.(png|jpe?g|gif|svg|webp)$/i, '.$1');
+    const cleanPath = path.join(dir, cleanFilename);
+
+    if (fs.existsSync(cleanPath)) {
+      res.sendFile(cleanPath);
+      fileServed = true;
+      break;
+    }
+  }
+
+  if (!fileServed) {
+    next(); // Agar kahin bhi nahi milti to standard flow par jane dein
+  }
+});
+
+// Normal assets (JS, CSS) ke liye standard configurations
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'Public')));
 
-// Root level 'admin' folder ko static serve karna (css/js files load karne ke liye)
+// Root level 'admin' folder ko static serve karna (admin panel ki stylesheet wagera load karne ke liye)
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
@@ -116,14 +150,14 @@ app.get('/admin/dashboard', (req, res) => {
 adminRouter(app);
 
 // ==========================================
-// 🌐 PRIORITY 3: GLOBAL FALLBACK (For React/SPA)
+// 🌐 PRIORITY 3: GLOBAL FALLBACK (For Frontend/SPA)
 // ==========================================
 app.use((req, res) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ message: 'Route not found.' });
   }
 
-  // Toote hue images ya assets ko ghalti se html serve hone se rokne ke liye
+  // Toote hue direct assets ko ghalti se index.html serve hone se rokne ke liye 404 block
   if (req.path.match(/\.(png|jpe?g|gif|svg|ico|css|js)$/)) {
     return res.status(404).send("File not found");
   }

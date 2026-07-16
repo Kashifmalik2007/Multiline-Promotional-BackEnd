@@ -47,6 +47,12 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'Public')));
 
+// ====== IMAGES & ASSETS FIX (YAHAN EXPLICIT MAPPING ADD KI HAI) ======
+app.use('/assets', express.static(path.join(__dirname, 'public', 'assets')));
+app.use('/assets', express.static(path.join(__dirname, 'Public', 'assets')));
+app.use('/assets', express.static(path.join(__dirname, 'public', 'Assets')));
+app.use('/assets', express.static(path.join(__dirname, 'Public', 'Assets')));
+
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
 // 1. ADMIN LOGIN BULLETPROOF HANDLER (Automatic multiple path detection)
